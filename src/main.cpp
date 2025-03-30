@@ -3,10 +3,17 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include <Windows.h>
-#include <gl/GL.h>
+#include <GL/gl.h>
 #include "glext.h"
+
+#ifdef _WIN32
+#include <Windows.h>
 #include "wglext.h"
+#else
+#include <X11/Xlib.h>
+#include <GL/glx.h>
+#include "glxext.h"
+#endif
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -17,17 +24,36 @@ using s32 = int32_t;
 using f32 = float;
 
 const f32 pi = 3.14159265f;
+const f32 deg_to_rad_constant = pi / 180.f;
 
-inline f32 DegreesToRadians(f32 degrees) { return degrees * pi / 180.f; }
+inline f32 DegreesToRadians(f32 degrees) { return degrees * deg_to_rad_constant; }
 
 bool running = true;
-const char* CLASS_NAME = "Window Class";
 const char* window_title = "Renderer";
 s32 window_width = 2560;
 s32 window_height = 1080;
 bool wireframe = false;
+#ifdef _WIN32
+const char* CLASS_NAME = "Window Class";
 HGLRC render_context;
 HWND render_window;
+
+const s32 pixel_format_attrib_list[] =
+{
+    WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
+    WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
+    WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
+    WGL_COLOR_BITS_ARB, 32,
+    WGL_DEPTH_BITS_ARB, 24,
+    WGL_STENCIL_BITS_ARB, 8,
+    0
+};
+
+const s32 context_attrib_list[] =
+{
+    WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
+    0
+};
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -117,6 +143,7 @@ void CreateWin32Surface(HINSTANCE hInstance, s32 nShowCmd, s32 width, s32 height
     ShowWindow(render_window, nShowCmd);
     UpdateWindow(render_window);
 }
+#endif
 
 PFNGLCREATESHADERPROC glCreateShader;
 PFNGLSHADERSOURCEPROC glShaderSource;
@@ -144,34 +171,18 @@ PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
 PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 PFNGLUNIFORM3FPROC glUniform3f;
 PFNGLUNIFORM4FPROC glUniform4f;
-PFNGLACTIVETEXTUREPROC glActiveTexture;
 PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor;
 PFNGLDRAWELEMENTSINSTANCEDPROC glDrawElementsInstanced;
-PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
-PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
 PFNGLUNIFORM1FPROC glUniform1f;
 PFNGLUNIFORM1IPROC glUniform1i;
-PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 
-const s32 pixel_format_attrib_list[] =
-{
-    WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
-    WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
-    WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
-    WGL_COLOR_BITS_ARB, 32,
-    WGL_DEPTH_BITS_ARB, 24,
-    WGL_STENCIL_BITS_ARB, 8,
-    0
-};
-
-const s32 context_attrib_list[] =
-{
-    WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
-    0
-};
+#ifdef _WIN32
+  PFNGLACTIVETEXTUREPROC glActiveTexture;
+#endif
 
 void InitGLFunctions()
 {
+#ifdef _WIN32
     glCreateShader = (PFNGLCREATESHADERPROC)wglGetProcAddress("glCreateShader");
     glShaderSource = (PFNGLSHADERSOURCEPROC)wglGetProcAddress("glShaderSource");
     glCompileShader = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader");
@@ -198,20 +209,49 @@ void InitGLFunctions()
     glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)wglGetProcAddress("glGetUniformLocation");
     glUniform3f = (PFNGLUNIFORM3FPROC)wglGetProcAddress("glUniform3f");
     glUniform4f = (PFNGLUNIFORM4FPROC)wglGetProcAddress("glUniform4f");
-    glActiveTexture = (PFNGLACTIVETEXTUREPROC)wglGetProcAddress("glActiveTexture");
     glVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC)wglGetProcAddress("glVertexAttribDivisor");
     glDrawElementsInstanced = (PFNGLDRAWELEMENTSINSTANCEDPROC)wglGetProcAddress("glDrawElementsInstanced");
-    wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
-    wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
     glUniform1f = (PFNGLUNIFORM1FPROC)wglGetProcAddress("glUniform1f");
     glUniform1i = (PFNGLUNIFORM1IPROC)wglGetProcAddress("glUniform1i");
-    wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
+    glActiveTexture = (PGNGLACTIVETEXTUREPROC)wglGetProcAddress("glActiveTexture");
+#else
+    glCreateShader = (PFNGLCREATESHADERPROC)glXGetProcAddress((const unsigned char*)"glCreateShader");
+    glShaderSource = (PFNGLSHADERSOURCEPROC)glXGetProcAddress((const unsigned char*)"glShaderSource");
+    glCompileShader = (PFNGLCOMPILESHADERPROC)glXGetProcAddress((const unsigned char*)"glCompileShader");
+    glGetShaderiv = (PFNGLGETSHADERIVPROC)glXGetProcAddress((const unsigned char*)"glGetShaderiv");
+    glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)glXGetProcAddress((const unsigned char*)"glGetShaderInfoLog");
+    glCreateProgram = (PFNGLCREATEPROGRAMPROC)glXGetProcAddress((const unsigned char*)"glCreateProgram");
+    glAttachShader = (PFNGLATTACHSHADERPROC)glXGetProcAddress((const unsigned char*)"glAttachShader");
+    glLinkProgram = (PFNGLLINKPROGRAMPROC)glXGetProcAddress((const unsigned char*)"glLinkProgram");
+    glGetProgramiv = (PFNGLGETPROGRAMIVPROC)glXGetProcAddress((const unsigned char*)"glGetProgramiv");
+    glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)glXGetProcAddress((const unsigned char*)"glGetProgramInfoLog");
+    glUseProgram = (PFNGLUSEPROGRAMPROC)glXGetProcAddress((const unsigned char*)"glUseProgram");
+    glDeleteShader = (PFNGLDELETESHADERPROC)glXGetProcAddress((const unsigned char*)"glDeleteShader");
+    glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)glXGetProcAddress((const unsigned char*)"glVertexAttribPointer");
+    glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)glXGetProcAddress((const unsigned char*)"glEnableVertexAttribArray");
+    glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)glXGetProcAddress((const unsigned char*)"glGenVertexArrays");
+    glGenBuffers = (PFNGLGENBUFFERSPROC)glXGetProcAddress((const unsigned char*)"glGenBuffers");
+    glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)glXGetProcAddress((const unsigned char*)"glBindVertexArray");
+    glBindBuffer = (PFNGLBINDBUFFERPROC)glXGetProcAddress((const unsigned char*)"glBindBuffer");
+    glBufferData = (PFNGLBUFFERDATAPROC)glXGetProcAddress((const unsigned char*)"glBufferData");
+    glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)glXGetProcAddress((const unsigned char*)"glDeleteVertexArrays");
+    glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)glXGetProcAddress((const unsigned char*)"glDeleteBuffers");
+    glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)glXGetProcAddress((const unsigned char*)"glGenerateMipmap");
+    glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)glXGetProcAddress((const unsigned char*)"glUniformMatrix4fv");
+    glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)glXGetProcAddress((const unsigned char*)"glGetUniformLocation");
+    glUniform3f = (PFNGLUNIFORM3FPROC)glXGetProcAddress((const unsigned char*)"glUniform3f");
+    glUniform4f = (PFNGLUNIFORM4FPROC)glXGetProcAddress((const unsigned char*)"glUniform4f");
+    glVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC)glXGetProcAddress((const unsigned char*)"glVertexAttribDivisor");
+    glDrawElementsInstanced = (PFNGLDRAWELEMENTSINSTANCEDPROC)glXGetProcAddress((const unsigned char*)"glDrawElementsInstanced");
+    glUniform1f = (PFNGLUNIFORM1FPROC)glXGetProcAddress((const unsigned char*)"glUniform1f");
+    glUniform1i = (PFNGLUNIFORM1IPROC)glXGetProcAddress((const unsigned char*)"glUniform1i");
+#endif
 }
 
 bool InitGL()
 {
-
-    PIXELFORMATDESCRIPTOR pfd =
+#ifdef _WIN32
+PIXELFORMATDESCRIPTOR pfd =
     {
       sizeof(PIXELFORMATDESCRIPTOR),
       1,
@@ -251,8 +291,6 @@ bool InitGL()
     }
 
     wglMakeCurrent(device_context, tmp_render_context);
-    InitGLFunctions();
-
     s32 pixel_format_index;
     u32 num_formats;
 
@@ -267,6 +305,9 @@ bool InitGL()
 
     wglDeleteContext(tmp_render_context);
     wglMakeCurrent(device_context, render_context);
+#endif
+    InitGLFunctions();
+
     glViewport(0, 0, window_width, window_height);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -400,19 +441,6 @@ public:
 
         return result;
     }
-
-    // static mat4 Orthographic(f32 left, f32 right, f32 bottom, f32 top)
-    // {
-    //   mat4 result = mat4::Identity();
-
-    //   result.elements[0] = 2.f / (right - left);
-    //   result.elements[3] = -(right + left) / (right - left);
-    //   result.elements[5] = 2.f / (top - bottom);
-    //   result.elements[7] = -(top + bottom) / (top - bottom);
-    //   result.elements[10] = -1.f;
-
-    //   return result;
-    // }
 
     static mat4 Perspective(f32 fov, f32 aspect, f32 _near, f32 _far)
     {
@@ -613,15 +641,38 @@ u32 CreateGLShader(const char* filepath)
     return program;
 }
 
+#ifdef _WIN32
 s32 WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, s32 nCmdShow)
+#else
+s32 main()
+#endif
 {
-    CreateWin32DebugConsole();
-    CreateWin32Surface(hInstance, nCmdShow, window_width, window_height, false);
+#ifdef _WIN32
+  CreateWin32DebugConsole();
+  CreateWin32Surface(hInstance, nCmdShow, window_width, window_height, false);
+#else
+    Display* display = XOpenDisplay(NULL);
+    Window root = DefaultRootWindow(display);
+    s32 att[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None };
+    XVisualInfo* vi = glXChooseVisual(display, 0, att);
+    Colormap cmap = XCreateColormap(display, root, vi->visual, AllocNone);
+    XSetWindowAttributes swa;
+    swa.colormap = cmap;
+    swa.event_mask = ExposureMask | KeyPressMask;
+    Window win = XCreateWindow(display, root, 0, 0, window_width, window_height, 0, vi->depth, InputOutput, vi->visual, CWColormap | CWEventMask, &swa);
+    XMapWindow(display, win);
+    XStoreName(display, win, window_title);
+    GLXContext glc = glXCreateContext(display, vi, NULL, GL_TRUE);
+    glXMakeCurrent(display, win, glc);
+    XEvent xev;
+#endif    
     InitGL();
 
     glEnable(GL_DEPTH_TEST);
-
+    
+#ifdef _WIN32
     wglSwapIntervalEXT(1);
+#endif
 
     float vertices[] = {
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -723,13 +774,15 @@ s32 WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
     glUseProgram(shader);
     glUniform1i(glGetUniformLocation(shader, "_texture"), 0);
 
-    //f32 angle = 0.f;
-
-    MSG msg;
+#ifdef _WIN32
+MSG msg;
     ZeroMemory(&msg, sizeof(MSG));
+#endif
+
     while (running)
     {
-        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+#ifdef _WIN32
+          if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
             if (msg.message == WM_QUIT)
             {
@@ -767,26 +820,54 @@ s32 WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
 
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
-
-        //mat4 model = mat4::Identity();
-        //model *= mat4::Rotate(angle, vec3(0.5f, 1.f, 0.f));
-        //
-        //mat4 view = mat4::Identity();
-        //view *= mat4::Translate(vec3(0.f, 0.f, -3.f));
-        //
-        //mat4 projection = mat4::Perspective(DegreesToRadians(45.f), (f32)window_width / (f32)window_height, 0.1f, 100.f);
-        //
-        //glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, model.elements);
-        //glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, view.elements);
-        //glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, projection.elements);
-        
-        //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-        //glDrawArrays(GL_TRIANGLES, 0, 36);
         glUseProgram(0);
 
-        //angle += 0.003f;
-
         SwapBuffers(GetDC(render_window));
+#else
+      XNextEvent(display, &xev);
+    
+      if (xev.type == Expose)
+      {
+      glClearColor(0.2f, 0.3f, 0.3f, 1.f);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+      glActiveTexture(GL_TEXTURE0);
+      glBindTexture(GL_TEXTURE_2D, texture);
+
+      glUseProgram(shader);
+      glBindVertexArray(vao);
+
+      for (u32 i = 0; i < 10; i++)
+      {
+        f32 angle = 20.f * i;
+        mat4 model = mat4::Identity();
+        model *= mat4::Translate(cubePositions[i]);
+        model *= mat4::Rotate(DegreesToRadians(angle), vec3(1.f, 0.3f, 0.5f));
+
+            mat4 view = mat4::Identity();
+            view *= mat4::Translate(vec3(0.f, 0.f, -3.f));
+
+            mat4 projection = mat4::Perspective(DegreesToRadians(45.f), (f32)window_width / (f32)window_height, 0.1f, 100.f);
+
+            glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, model.elements);
+            glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, view.elements);
+            glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, projection.elements);
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+        
+        glXSwapBuffers(display, win);
+        glUseProgram(0);
+      }
+      else if (xev.type == KeyPress)
+      {
+        glXMakeCurrent(display, None, NULL);
+        glXDestroyContext(display, glc);
+        XDestroyWindow(display, win);
+        XCloseDisplay(display);
+        running = false;
+      }
+#endif
     }
 
 	return 0;
