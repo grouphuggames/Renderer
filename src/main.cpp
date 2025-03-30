@@ -3,15 +3,17 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include <GL/gl.h>
-#include "glext.h"
 
 #ifdef _WIN32
 #include <Windows.h>
+#include <gl/GL.h>
+#include "glext.h"
 #include "wglext.h"
 #else
+#include <GL/gl.h>
 #include <X11/Xlib.h>
 #include <GL/glx.h>
+#include "glext.h"
 #include "glxext.h"
 #endif
 
@@ -33,6 +35,7 @@ const char* window_title = "Renderer";
 s32 window_width = 2560;
 s32 window_height = 1080;
 bool wireframe = false;
+
 #ifdef _WIN32
 const char* CLASS_NAME = "Window Class";
 HGLRC render_context;
@@ -178,11 +181,17 @@ PFNGLUNIFORM1IPROC glUniform1i;
 
 #ifdef _WIN32
   PFNGLACTIVETEXTUREPROC glActiveTexture;
+  PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
+  PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
+  PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
 #endif
 
 void InitGLFunctions()
 {
 #ifdef _WIN32
+    wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
+
+    if (wglChoosePixelFormatARB == NULL)  return;
     glCreateShader = (PFNGLCREATESHADERPROC)wglGetProcAddress("glCreateShader");
     glShaderSource = (PFNGLSHADERSOURCEPROC)wglGetProcAddress("glShaderSource");
     glCompileShader = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader");
@@ -213,7 +222,10 @@ void InitGLFunctions()
     glDrawElementsInstanced = (PFNGLDRAWELEMENTSINSTANCEDPROC)wglGetProcAddress("glDrawElementsInstanced");
     glUniform1f = (PFNGLUNIFORM1FPROC)wglGetProcAddress("glUniform1f");
     glUniform1i = (PFNGLUNIFORM1IPROC)wglGetProcAddress("glUniform1i");
-    glActiveTexture = (PGNGLACTIVETEXTUREPROC)wglGetProcAddress("glActiveTexture");
+    glActiveTexture = (PFNGLACTIVETEXTUREPROC)wglGetProcAddress("glActiveTexture");
+    wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
+
+    wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
 #else
     glCreateShader = (PFNGLCREATESHADERPROC)glXGetProcAddress((const unsigned char*)"glCreateShader");
     glShaderSource = (PFNGLSHADERSOURCEPROC)glXGetProcAddress((const unsigned char*)"glShaderSource");
@@ -294,6 +306,8 @@ PIXELFORMATDESCRIPTOR pfd =
     s32 pixel_format_index;
     u32 num_formats;
 
+    InitGLFunctions();
+
     wglChoosePixelFormatARB(device_context, pixel_format_attrib_list, NULL, 1, &pixel_format_index, &num_formats);
 
     if (!SetPixelFormat(device_context, pixel_format_index, &pfd))
@@ -305,8 +319,9 @@ PIXELFORMATDESCRIPTOR pfd =
 
     wglDeleteContext(tmp_render_context);
     wglMakeCurrent(device_context, render_context);
-#endif
+#else
     InitGLFunctions();
+#endif
 
     glViewport(0, 0, window_width, window_height);
     glEnable(GL_BLEND);
