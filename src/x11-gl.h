@@ -2,6 +2,7 @@
 #include <GL/gl.h>
 #include <X11/Xlib.h>
 #include <GL/glx.h>
+#include <iostream>
 #include "glext.h"
 #include "glxext.h"
 #include "camera.h"
@@ -105,8 +106,13 @@ void InitDisplay()
 
 void ProcessInput(Camera& cam)
 {
-if(XCheckWindowEvent(display, win, KeyPressMask, &xev)) 
+/*if(XCheckWindowEvent(display, win, KeyPressMask, &xev)) 
+{
+if (XNextEvent(display, &xev))
       {
+      if (xev.type == KeyPress)
+{
+std::cout << "some key pressed\n";
         u32 keycode = xev.xkey.keycode;
         if (keycode == 25)
         {
@@ -132,8 +138,41 @@ if(XCheckWindowEvent(display, win, KeyPressMask, &xev))
         XCloseDisplay(display);
         running = false;
         }
+        }
       }
+}*/
+XNextEvent(display, &xev);
+
+  if (xev.type == KeyPress)
+  {
+u32 keycode = xev.xkey.keycode;
+        if (keycode == 25)
+        {
+          cam.position += cam.speed * cam.front;
+        }
+        else if (keycode == 39)
+        {
+          cam.position -= cam.speed * cam.front;
+        }
+        else if (keycode == 38)
+        {
+        cam.position -= cam.speed * vec3::normalize(vec3::cross(cam.front, cam.up));
+        }
+        else if (keycode == 40)
+        {
+        cam.position += cam.speed * vec3::normalize(vec3::cross(cam.front, cam.up));
+        }
+        else if (keycode == 9)
+        {
+        glXMakeCurrent(display, None, NULL);
+        glXDestroyContext(display, glc);
+        XDestroyWindow(display, win);
+        XCloseDisplay(display);
+        running = false;
+        }
+  }
 }
+
 
 void SwapGLBuffers()
 {

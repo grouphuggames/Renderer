@@ -8,52 +8,47 @@
 #include "stb_image.h"
 
 float vertices[] = {
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
 
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
 
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
 
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
 
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-};
-
-u32 indices[] = {
-    0, 1, 3,
-    1, 2, 3
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
 };
 
 vec3 cubePositions[] = {
@@ -69,13 +64,18 @@ vec3(1.5f,  0.2f, -1.5f),
 vec3(-1.3f,  1.0f, -1.5f)
 };
 
-u32 shader, vao, vbo, ebo, texture;
-
+u32 shader, light_shader, vao, light_vao, vbo;
+vec3 light_color = vec3(1.f, 1.f, 1.f);
+vec3 object_color = vec3(1.f, 0.5f, 0.31f);
+vec3 light_position(1.2f, 1.f, 2.f);
 Camera camera;
 
 void InitScene()
 {
-    shader = CreateGLShader("../res/texture.glsl");
+    camera.position.y += 1.f;
+    camera.position.z += 2.f;
+    shader = CreateGLShader("../res/basic.glsl");
+    light_shader = CreateGLShader("../res/light.glsl");
 
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -83,64 +83,66 @@ void InitScene()
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glGenBuffers(1, &ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(f32), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(f32), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(f32), (void*)(3 * sizeof(f32)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(f32), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    s32 tex_width, tex_height, tex_num_channels;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    unsigned char* tex_data = stbi_load("../res/container.jpg", &tex_width, &tex_height, &tex_num_channels, 0);
-    if (tex_data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tex_width, tex_height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex_data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    stbi_image_free(tex_data);
+    glGenVertexArrays(1, &light_vao);
+    glBindVertexArray(light_vao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(f32), (void*)0);
+    glEnableVertexAttribArray(0);
 
     glUseProgram(shader);
-    glUniform1i(glGetUniformLocation(shader, "_texture"), 0);
 }
 
 void MainLoop()
 {
-glClearColor(0.2f, 0.3f, 0.3f, 1.f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glClearColor(0.1f, 0.1f, 0.1f, 1.f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  
+  glUseProgram(shader);
+  glBindVertexArray(vao);
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture);
+  mat4 model = mat4::Identity();
+  
+  mat4 view = mat4::Identity();
+  view = mat4::LookAt(camera.position, camera.position + camera.front, camera.up);
+  
+  mat4 projection = mat4::Perspective(DegreesToRadians(45.f), (f32)window_width / (f32)window_height, 0.1f, 100.f);
+  
+  glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, model.elements);
+  glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, view.elements);
+  glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, projection.elements);
 
-        glUseProgram(shader);
-        glBindVertexArray(vao);
+  glUniform3f(glGetUniformLocation(shader, "object_color"), object_color.x, object_color.y, object_color.z);
+  glUniform3f(glGetUniformLocation(shader, "light_color"), light_color.x, light_color.y, light_color.z);
+  glUniform3f(glGetUniformLocation(shader, "light_position"), light_position.x, light_position.y, light_position.z);
+  glUniform3f(glGetUniformLocation(shader, "view_position"), camera.position.x, camera.position.y, camera.position.z);
+  
+  glDrawArrays(GL_TRIANGLES, 0, 36);
+  glUseProgram(0);
 
-        for (u32 i = 0; i < 10; i++)
-        {
-            f32 angle = 20.f * i;
-            mat4 model = mat4::Identity();
-            model *= mat4::Translate(cubePositions[i]);
-            model *= mat4::Rotate(DegreesToRadians(angle), vec3(1.f, 0.3f, 0.5f));
+  glUseProgram(light_shader);
+  glBindVertexArray(light_vao);
 
-            mat4 view = mat4::Identity();
-            view = mat4::LookAt(camera.position, camera.position + camera.front, camera.up);
+  model = mat4::Identity();
+  model *= mat4::Translate(light_position);
+  model *= mat4::Scale(vec3(0.2f, 0.2f, 0.2f));
 
-            mat4 projection = mat4::Perspective(DegreesToRadians(45.f), (f32)window_width / (f32)window_height, 0.1f, 100.f);
+  view = mat4::LookAt(camera.position, camera.position + camera.front, camera.up);
+  projection = mat4::Perspective(DegreesToRadians(45.f), (f32)window_width / (f32)window_height, 0.1f, 100.f);
 
-            glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, model.elements);
-            glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, view.elements);
-            glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, projection.elements);
+  glUniformMatrix4fv(glGetUniformLocation(light_shader, "model"), 1, GL_FALSE, model.elements);
+  glUniformMatrix4fv(glGetUniformLocation(light_shader, "view"), 1, GL_FALSE, view.elements);
+  glUniformMatrix4fv(glGetUniformLocation(light_shader, "projection"), 1, GL_FALSE, projection.elements);
 
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
-        glUseProgram(0);
+  glDrawArrays(GL_TRIANGLES, 0, 36);
+  glUseProgram(0);
 }
 
 #ifdef _WIN32

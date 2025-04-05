@@ -30,7 +30,6 @@ PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
 PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
 PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 PFNGLUNIFORM3FPROC glUniform3f;
-PFNGLUNIFORM3FVPROC glUniform3fv;
 PFNGLUNIFORM4FPROC glUniform4f;
 PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor;
 PFNGLDRAWELEMENTSINSTANCEDPROC glDrawElementsInstanced;
@@ -114,13 +113,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
                 wireframe = true;
             }
-            break;
-        }
-        case VK_ESCAPE:
-        {
-            running = false;
-            PostQuitMessage(0);
-            return 0;
         }
         default:
             break;
@@ -134,7 +126,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 void ProcessInput(Camera& cam)
-{
+{void ProcessInput(Camera& cam)
 if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
             TranslateMessage(&msg);
@@ -229,7 +221,6 @@ void InitGLFunctions()
     glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)wglGetProcAddress("glUniformMatrix4fv");
     glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)wglGetProcAddress("glGetUniformLocation");
     glUniform3f = (PFNGLUNIFORM3FPROC)wglGetProcAddress("glUniform3f");
-    glUniform3fv = (PFNGLUNIFORM3FVPROC)wglGetProcAddress("glUniform3fv");
     glUniform4f = (PFNGLUNIFORM4FPROC)wglGetProcAddress("glUniform4f");
     glVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC)wglGetProcAddress("glVertexAttribDivisor");
     glDrawElementsInstanced = (PFNGLDRAWELEMENTSINSTANCEDPROC)wglGetProcAddress("glDrawElementsInstanced");
